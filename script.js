@@ -1,6 +1,6 @@
 let isSaving = false;
 
-const API_BASE = "https://todobackend-1-ridi.onrender.com";
+const API_BASE = "https://todobackend-1-ridi.onrender.com/tasks";
 
 async function loadTasks() {
   try {
@@ -64,3 +64,4 @@ document.getElementById("task-input").addEventListener("keypress", function (eve
 });
 
 loadTasks();
+
