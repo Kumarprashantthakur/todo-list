@@ -1,4 +1,3 @@
-<script>
 let isSaving = false; 
 
 async function loadTasks() {
@@ -46,7 +45,7 @@ async function addTask() {
 }
 
 async function deleteTask(id) {
-  await fetch(`https://todobackend-1-ridi.onrender.com/tasks/${id}`, {
+  await fetch(`https://todobackend-1-ridi.onrender.com/tasks/${id}`, { 
     method: "DELETE"
   });
   loadTasks();
@@ -59,5 +58,3 @@ document.getElementById("task-input").addEventListener("keypress", function(even
 });
 
 loadTasks();
-</script>
-
