@@ -2,7 +2,7 @@
 let isSaving = false; 
 
 async function loadTasks() {
-  const res = await fetch("https://todobackend-1-ridi.onrender.com/tasks"); // ✅ fixed endpoint
+  const res = await fetch("https://todobackend-1-ridi.onrender.com/tasks"); 
   const tasks = await res.json();
   const list = document.getElementById("task-list");
   list.innerHTML = "";
@@ -23,10 +23,10 @@ async function addTask() {
   if (!text) { isSaving = false; return; }
 
   try {
-    const res = await fetch("https://todobackend-1-ridi.onrender.com/tasks", { // ✅ fixed endpoint
+    const res = await fetch("https://todobackend-1-ridi.onrender.com/tasks", { 
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text, completed: false }) // ✅ send completed flag
+      body: JSON.stringify({ text, completed: false }) 
     });
 
     if (!res.ok) {
@@ -46,7 +46,7 @@ async function addTask() {
 }
 
 async function deleteTask(id) {
-  await fetch(`https://todobackend-1-ridi.onrender.com/tasks/${id}`, { // ✅ fixed endpoint
+  await fetch(`https://todobackend-1-ridi.onrender.com/tasks/${id}`, {
     method: "DELETE"
   });
   loadTasks();
@@ -60,3 +60,4 @@ document.getElementById("task-input").addEventListener("keypress", function(even
 
 loadTasks();
 </script>
+
