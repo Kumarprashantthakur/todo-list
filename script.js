@@ -1,6 +1,6 @@
 let isSaving = false;
 
-// Use deployed backend URL
+// Backend root URL (no /tasks here)
 const API_BASE = "https://todobackend-ui56.onrender.com";
 
 async function loadTasks() {
@@ -9,6 +9,8 @@ async function loadTasks() {
     if (!res.ok) throw new Error("Failed to fetch tasks");
 
     const tasks = await res.json();
+    console.log("Loaded tasks:", tasks); // Debug
+
     const list = document.getElementById("task-list");
     list.innerHTML = "";
     tasks.forEach(task => {
@@ -23,7 +25,7 @@ async function loadTasks() {
 }
 
 async function addTask() {
-  if (isSaving) return; 
+  if (isSaving) return;
   isSaving = true;
 
   const input = document.getElementById("task-input");
@@ -37,22 +39,32 @@ async function addTask() {
       body: JSON.stringify({ text })
     });
 
+    const data = await res.json();
+    console.log("Add task response:", data); // Debug
+
     if (!res.ok) {
       alert("❌ Failed to add task");
+    } else {
+      // Add task to UI immediately
+      const list = document.getElementById("task-list");
+      const li = document.createElement("li");
+      li.innerHTML = `${data.text} <span onclick="deleteTask('${data._id}')">✂️</span>`;
+      if (data.completed) li.classList.add("completed");
+      list.appendChild(li);
     }
   } catch (err) {
     console.error("Error adding task:", err);
   }
 
   input.value = "";
-  await loadTasks();
   isSaving = false;
 }
 
 async function deleteTask(id) {
   try {
     await fetch(`${API_BASE}/tasks/${id}`, { method: "DELETE" });
-    loadTasks();
+    // Remove task from UI without full reload
+    document.querySelector(`span[onclick="deleteTask('${id}')"]`).parentElement.remove();
   } catch (err) {
     console.error("Error deleting task:", err);
   }
@@ -64,4 +76,5 @@ document.getElementById("task-input").addEventListener("keypress", function(even
   }
 });
 
+// Initial load
 loadTasks();
