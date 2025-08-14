@@ -1,48 +1,38 @@
-let isSaving = false; 
+let tasks = [];
 
-async function loadTasks() {
-  const res = await fetch("http://localhost:5000/tasks");
-  const tasks = await res.json();
+function loadTasks() {
   const list = document.getElementById("task-list");
   list.innerHTML = "";
-  tasks.forEach(task => {
+  tasks.forEach((task, index) => {
     const li = document.createElement("li");
-    li.innerHTML = `${task.text} <span onclick="deleteTask('${task._id}')">✂️</span>`;
-    if (task.completed) li.classList.add("completed");
+    li.textContent = task.text;
+
+    const delBtn = document.createElement("span");
+    delBtn.textContent = "✂️";
+    delBtn.style.cursor = "pointer";
+    delBtn.onclick = () => deleteTask(index);
+
+    li.appendChild(delBtn);
     list.appendChild(li);
   });
 }
 
-async function addTask() {
-  if (isSaving) return; 
-  isSaving = true;
-
+function addTask() {
   const input = document.getElementById("task-input");
   const text = input.value.trim();
-  if (!text) { isSaving = false; return; }
+  if (!text) return;
 
-  const res = await fetch("http://localhost:5000/tasks", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text })
-  });
-
-  if (!res.ok) {
-    alert("❌ Failed to add task");
-  }
-
+  tasks.push({ text });
+  loadTasks();
   input.value = "";
-  await loadTasks();
-  isSaving = false;
 }
 
-async function deleteTask(id) {
-  await fetch(`http://localhost:5000/tasks/${id}`, { method: "DELETE" });
+function deleteTask(index) {
+  tasks.splice(index, 1);
   loadTasks();
 }
 
-
-document.getElementById("task-input").addEventListener("keypress", function(event) {
+document.getElementById("task-input").addEventListener("keypress", function (event) {
   if (event.key === "Enter") {
     addTask();
   }
