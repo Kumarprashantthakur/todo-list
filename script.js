@@ -1,84 +1,63 @@
 let isSaving = false;
-const API_URL = "https://todobackend-1-ridi.onrender.com/tasks";
+
+const API_BASE = "https://todobackend-1-ridi.onrender.com";
 
 async function loadTasks() {
   try {
-    const res = await fetch(API_URL);
-    if (!res.ok) throw new Error("Failed to load tasks");
-
+    const res = await fetch(`${API_BASE}/tasks`);
+    if (!res.ok) throw new Error("Failed to fetch tasks");
     const tasks = await res.json();
+
     const list = document.getElementById("task-list");
     list.innerHTML = "";
-
     tasks.forEach(task => {
       const li = document.createElement("li");
       li.innerHTML = `${task.text} <span onclick="deleteTask('${task._id}')">✂️</span>`;
       if (task.completed) li.classList.add("completed");
       list.appendChild(li);
     });
-  } catch (error) {
-    console.error("Error loading tasks:", error);
+  } catch (err) {
+    console.error("Error loading tasks:", err);
   }
 }
 
 async function addTask() {
-  if (isSaving) return; 
+  if (isSaving) return;
   isSaving = true;
 
   const input = document.getElementById("task-input");
-  const addBtn = document.getElementById("add-btn");
-  const originalBtnText = addBtn.innerText;
-
-  // Show saving state
-  addBtn.innerText = "Saving...";
-  addBtn.disabled = true;
-
   const text = input.value.trim();
-  if (!text) {
-    resetButton(addBtn, originalBtnText);
-    return;
-  }
+  if (!text) { isSaving = false; return; }
 
   try {
-    const res = await fetch(API_URL, { 
+    const res = await fetch(`${API_BASE}/tasks`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text, completed: false })
+      body: JSON.stringify({ text })
     });
 
     if (!res.ok) {
-      const errMsg = await res.text();
-      console.error("Add task failed:", errMsg);
-      alert("❌ Failed to add task: " + errMsg);
-    } else {
-      input.value = "";
-      await loadTasks();
+      alert("❌ Failed to add task");
     }
-  } catch (error) {
-    console.error("Network error:", error);
-    alert("❌ Network error while adding task");
+  } catch (err) {
+    console.error("Error adding task:", err);
   }
 
-  resetButton(addBtn, originalBtnText);
-}
-
-function resetButton(button, text) {
-  button.innerText = text;
-  button.disabled = false;
+  input.value = "";
+  await loadTasks();
   isSaving = false;
 }
 
 async function deleteTask(id) {
   try {
-    await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-    await loadTasks();
-  } catch (error) {
-    console.error("Error deleting task:", error);
+    await fetch(`${API_BASE}/tasks/${id}`, { method: "DELETE" });
+    loadTasks();
+  } catch (err) {
+    console.error("Error deleting task:", err);
   }
 }
 
-// Enter key also triggers addTask
-document.getElementById("task-input").addEventListener("keypress", function(event) {
+document.getElementById("task-input").addEventListener("keypress", function (event) {
   if (event.key === "Enter") {
     addTask();
   }
