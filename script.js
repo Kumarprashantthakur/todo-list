@@ -1,6 +1,6 @@
 let isSaving = false;
 
-// FIX: use only the root URL here
+// Correct: backend root, not /tasks
 const API_BASE = "https://todobackend-1-ridi.onrender.com";
 
 async function loadTasks() {
@@ -36,6 +36,9 @@ async function addTask() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text })
     });
+
+    const data = await res.json();
+    console.log("Add task response:", data); // Debug
 
     if (!res.ok) {
       alert("❌ Failed to add task");
