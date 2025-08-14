@@ -1,16 +1,25 @@
-let isSaving = false; 
+let isSaving = false;
+
+// Use deployed backend URL
+const API_BASE = "https://todobackend-ui56.onrender.com";
 
 async function loadTasks() {
-  const res = await fetch("https://todobackend-1-ridi.onrender.com");
-  const tasks = await res.json();
-  const list = document.getElementById("task-list");
-  list.innerHTML = "";
-  tasks.forEach(task => {
-    const li = document.createElement("li");
-    li.innerHTML = `${task.text} <span onclick="deleteTask('${task._id}')">✂️</span>`;
-    if (task.completed) li.classList.add("completed");
-    list.appendChild(li);
-  });
+  try {
+    const res = await fetch(`${API_BASE}/tasks`);
+    if (!res.ok) throw new Error("Failed to fetch tasks");
+
+    const tasks = await res.json();
+    const list = document.getElementById("task-list");
+    list.innerHTML = "";
+    tasks.forEach(task => {
+      const li = document.createElement("li");
+      li.innerHTML = `${task.text} <span onclick="deleteTask('${task._id}')">✂️</span>`;
+      if (task.completed) li.classList.add("completed");
+      list.appendChild(li);
+    });
+  } catch (err) {
+    console.error("Error loading tasks:", err);
+  }
 }
 
 async function addTask() {
@@ -21,14 +30,18 @@ async function addTask() {
   const text = input.value.trim();
   if (!text) { isSaving = false; return; }
 
-  const res = await fetch("https://todobackend-1-ridi.onrender.com", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text })
-  });
+  try {
+    const res = await fetch(`${API_BASE}/tasks`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text })
+    });
 
-  if (!res.ok) {
-    alert("❌ Failed to add task");
+    if (!res.ok) {
+      alert("❌ Failed to add task");
+    }
+  } catch (err) {
+    console.error("Error adding task:", err);
   }
 
   input.value = "";
@@ -37,10 +50,13 @@ async function addTask() {
 }
 
 async function deleteTask(id) {
-  await fetch(`https://todobackend-1-ridi.onrender.com/${id}`, { method: "DELETE" });
-  loadTasks();
+  try {
+    await fetch(`${API_BASE}/tasks/${id}`, { method: "DELETE" });
+    loadTasks();
+  } catch (err) {
+    console.error("Error deleting task:", err);
+  }
 }
-
 
 document.getElementById("task-input").addEventListener("keypress", function(event) {
   if (event.key === "Enter") {
@@ -49,4 +65,3 @@ document.getElementById("task-input").addEventListener("keypress", function(even
 });
 
 loadTasks();
-
