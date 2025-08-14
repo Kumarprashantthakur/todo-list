@@ -1,6 +1,6 @@
 let isSaving = false;
 
-// Backend root URL (no /tasks here)
+
 const API_BASE = "https://todobackend-ui56.onrender.com";
 
 async function loadTasks() {
@@ -9,7 +9,7 @@ async function loadTasks() {
     if (!res.ok) throw new Error("Failed to fetch tasks");
 
     const tasks = await res.json();
-    console.log("Loaded tasks:", tasks); // Debug
+    console.log("Loaded tasks:", tasks);
 
     const list = document.getElementById("task-list");
     list.innerHTML = "";
@@ -40,12 +40,11 @@ async function addTask() {
     });
 
     const data = await res.json();
-    console.log("Add task response:", data); // Debug
-
+    console.log("Add task response:", data); 
     if (!res.ok) {
       alert("❌ Failed to add task");
     } else {
-      // Add task to UI immediately
+
       const list = document.getElementById("task-list");
       const li = document.createElement("li");
       li.innerHTML = `${data.text} <span onclick="deleteTask('${data._id}')">✂️</span>`;
@@ -63,7 +62,7 @@ async function addTask() {
 async function deleteTask(id) {
   try {
     await fetch(`${API_BASE}/tasks/${id}`, { method: "DELETE" });
-    // Remove task from UI without full reload
+
     document.querySelector(`span[onclick="deleteTask('${id}')"]`).parentElement.remove();
   } catch (err) {
     console.error("Error deleting task:", err);
@@ -78,3 +77,4 @@ document.getElementById("task-input").addEventListener("keypress", function(even
 
 // Initial load
 loadTasks();
+
