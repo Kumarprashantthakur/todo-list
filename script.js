@@ -1,6 +1,6 @@
 const API_URL = "https://todobackend-production-8022.up.railway.app/tasks"; 
 
-
+// Load tasks from server
 async function loadTasks() {
   const list = document.getElementById("task-list");
   list.innerHTML = "";
@@ -28,6 +28,7 @@ async function loadTasks() {
   }
 }
 
+// Add new task
 async function addTask() {
   const input = document.getElementById("task-input");
   const text = input.value.trim();
@@ -36,12 +37,15 @@ async function addTask() {
   try {
     const res = await fetch(API_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text }),
+      headers: { 
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ text: text }), // Make sure key matches backend
     });
 
+    const errData = await res.json();
+
     if (!res.ok) {
-      const errData = await res.json();
       alert(errData.error || "Failed to add task");
       return;
     }
@@ -53,7 +57,7 @@ async function addTask() {
   }
 }
 
-
+// Delete task
 async function deleteTask(id) {
   try {
     const res = await fetch(`${API_URL}/${id}`, {
@@ -67,14 +71,12 @@ async function deleteTask(id) {
   }
 }
 
-
+// Add task on Enter key
 document.getElementById("task-input").addEventListener("keypress", function (event) {
   if (event.key === "Enter") {
     addTask();
   }
 });
 
-
+// Load tasks initially
 loadTasks();
-
-
