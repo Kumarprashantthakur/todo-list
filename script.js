@@ -1,75 +1,36 @@
-const API_URL = "https://todobackend-production-8022.up.railway.app/"; 
+let tasks = [];
 
-
-async function loadTasks() {
+function loadTasks() {
   const list = document.getElementById("task-list");
   list.innerHTML = "";
+  tasks.forEach((task, index) => {
+    const li = document.createElement("li");
+    li.textContent = task.text;
 
-  try {
-    const res = await fetch(API_URL);
-    if (!res.ok) throw new Error("Failed to fetch tasks");
+    const delBtn = document.createElement("span");
+    delBtn.textContent = "✂️";
+    delBtn.style.cursor = "pointer";
+    delBtn.onclick = () => deleteTask(index);
 
-    const tasks = await res.json();
-
-    tasks.forEach((task) => {
-      const li = document.createElement("li");
-      li.textContent = task.text;
-
-      const delBtn = document.createElement("span");
-      delBtn.textContent = " ✂️";
-      delBtn.style.cursor = "pointer";
-      delBtn.onclick = () => deleteTask(task._id);
-
-      li.appendChild(delBtn);
-      list.appendChild(li);
-    });
-  } catch (err) {
-    console.error("Error loading tasks:", err);
-  }
+    li.appendChild(delBtn);
+    list.appendChild(li);
+  });
 }
 
-async function addTask() {
+function addTask() {
   const input = document.getElementById("task-input");
   const text = input.value.trim();
   if (!text) return;
 
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: { 
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ text: text }), 
-    });
-
-    const errData = await res.json();
-
-    if (!res.ok) {
-      alert(errData.error || "Failed to add task");
-      return;
-    }
-
-    input.value = "";
-    loadTasks();
-  } catch (err) {
-    console.error("Error adding task:", err);
-  }
+  tasks.push({ text });
+  loadTasks();
+  input.value = "";
 }
 
-
-async function deleteTask(id) {
-  try {
-    const res = await fetch(`${API_URL}/${id}`, {
-      method: "DELETE",
-    });
-    if (!res.ok) throw new Error("Failed to delete task");
-
-    loadTasks();
-  } catch (err) {
-    console.error("Error deleting task:", err);
-  }
+function deleteTask(index) {
+  tasks.splice(index, 1);
+  loadTasks();
 }
-
 
 document.getElementById("task-input").addEventListener("keypress", function (event) {
   if (event.key === "Enter") {
@@ -77,6 +38,5 @@ document.getElementById("task-input").addEventListener("keypress", function (eve
   }
 });
 
-// Load tasks initially
 loadTasks();
 
