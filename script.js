@@ -1,4 +1,4 @@
-const API_URL = "https://todobackend-production-8022.up.railway.app/"; 
+const API_URL = "https://todobackend-production-8022.up.railway.app/tasks"; 
 
 
 async function loadTasks() {
@@ -76,4 +76,5 @@ document.getElementById("task-input").addEventListener("keypress", function (eve
 
 
 loadTasks();
+
 
